@@ -12,6 +12,7 @@ import java.util.List;
 
 public class Board {
     private List<Card> mCardArrayList;
+    private int mCardsLeft;
 
     public Board() {
         mCardArrayList = new LinkedList<>();
@@ -32,15 +33,24 @@ public class Board {
         mCardArrayList.add(new Card(R.drawable.colour8));
         mCardArrayList.add(new Card(R.drawable.colour8));
         Collections.shuffle(mCardArrayList);
+        mCardsLeft = 16;
     }
 
 
-    public Card getCard(int position){
+    public Card getCard(int position) {
         return mCardArrayList.get(position);
     }
 
 
-    public int getCardPosition(Card card){
+    public int getCardPosition(Card card) {
         return mCardArrayList.indexOf(card);
+    }
+
+    public void minusTwoCards() {
+        mCardsLeft = mCardsLeft - 2;
+    }
+
+    public int getCardsLeft() {
+        return mCardsLeft;
     }
 }

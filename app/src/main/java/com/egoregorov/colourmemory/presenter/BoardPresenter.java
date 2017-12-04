@@ -16,7 +16,7 @@ import java.util.concurrent.TimeUnit;
 public class BoardPresenter implements Presenter {
     private static final String TAG = "BoardPresenter";
 
-    private Board model;
+    private Board mModel;
     private BoardView mBoardView;
     private int mScore;
     private Card mPreviousCard;
@@ -24,13 +24,13 @@ public class BoardPresenter implements Presenter {
 
     public BoardPresenter(BoardView boardView) {
         mBoardView = boardView;
-        model = new Board();
+        mModel = new Board();
         mScore = 0;
     }
 
     @Override
     public void onCreate() {
-        model = new Board();
+        mModel = new Board();
         mBoardView.startNewGame();
         mScore = 0;
     }
@@ -51,12 +51,12 @@ public class BoardPresenter implements Presenter {
     }
 
     public Card onCardSelected(int position) {
-        if (model.getCard(position).isSelected()) {
+        if (mModel.getCard(position).isSelected()) {
             Log.d(TAG, "onCardSelected: return null");
             return null;
         } else {
             Log.d(TAG, "onCardSelected: return card");
-            Card selectedCard = model.getCard(position);
+            Card selectedCard = mModel.getCard(position);
             if (mPreviousCard != null) {
                 mCurrentCard = selectedCard;
 
@@ -88,8 +88,9 @@ public class BoardPresenter implements Presenter {
 
         @Override
         protected Void doInBackground(Boolean... booleans) {
+            Log.d(TAG, "doInBackground: starts");
             try {
-                TimeUnit.SECONDS.sleep(1);
+                TimeUnit.MILLISECONDS.sleep(750);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -101,13 +102,18 @@ public class BoardPresenter implements Presenter {
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
             if (mWasRight) {
-                mScore = +2;
-                mBoardView.gotTheScore(model.getCardPosition(mPreviousCard), model.getCardPosition(mCurrentCard), mScore);
+                mScore = mScore + 2;
+                mBoardView.gotTheScore(mModel.getCardPosition(mPreviousCard), mModel.getCardPosition(mCurrentCard), mScore);
+                mModel.minusTwoCards();
             } else {
                 if (mScore != 0) {
-                    mScore--;
+                    mScore = mScore - 1;
                 }
-                mBoardView.lostScore(model.getCardPosition(mPreviousCard), model.getCardPosition(mCurrentCard), mScore);
+                mBoardView.lostScore(mModel.getCardPosition(mPreviousCard), mModel.getCardPosition(mCurrentCard), mScore);
+            }
+            Log.d(TAG, "onPostExecute: " + mModel.getCardsLeft());
+            if (mModel.getCardsLeft() == 0) {
+                mBoardView.gameCompleted();
             }
             mCurrentCard = null;
             mPreviousCard = null;
