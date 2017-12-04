@@ -6,6 +6,6 @@ package com.egoregorov.colourmemory.view;
 
 public interface BoardView {
     void startNewGame();
-    void lostScore(int position1, int position2);
-    void gotTheScore(int position1, int position2);
+    void lostScore(int position1, int position2, int currentScore);
+    void gotTheScore(int position1, int position2, int currentScore);
 }

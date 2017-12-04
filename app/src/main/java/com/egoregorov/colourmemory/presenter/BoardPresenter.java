@@ -50,17 +50,17 @@ public class BoardPresenter implements Presenter {
 
     }
 
-    public Card onCardSelected(int position){
-        if (model.getCard(position).isSelected()){
+    public Card onCardSelected(int position) {
+        if (model.getCard(position).isSelected()) {
             Log.d(TAG, "onCardSelected: return null");
             return null;
-        } else{
+        } else {
             Log.d(TAG, "onCardSelected: return card");
             Card selectedCard = model.getCard(position);
-            if (mPreviousCard != null){
+            if (mPreviousCard != null) {
                 mCurrentCard = selectedCard;
 
-                if (selectedCard.getImageResourceId() == mPreviousCard.getImageResourceId()){
+                if (selectedCard.getImageResourceId() == mPreviousCard.getImageResourceId()) {
                     //TODO wait for 1 sec and dismiss cards, and add 2 points to the score
                     new DismissCardsTask().execute(true);
 
@@ -79,12 +79,13 @@ public class BoardPresenter implements Presenter {
         }
     }
 
-    public void onHighScoresSelected(){
+    public void onHighScoresSelected() {
 
     }
 
-    class DismissCardsTask extends AsyncTask<Boolean,Void,Void>{
+    class DismissCardsTask extends AsyncTask<Boolean, Void, Void> {
         boolean mWasRight;
+
         @Override
         protected Void doInBackground(Boolean... booleans) {
             try {
@@ -99,14 +100,14 @@ public class BoardPresenter implements Presenter {
         @Override
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
-            if (mWasRight){
-                mBoardView.gotTheScore(model.getCardPosition(mPreviousCard),model.getCardPosition(mCurrentCard));
-                mScore =+ 2;
+            if (mWasRight) {
+                mScore = +2;
+                mBoardView.gotTheScore(model.getCardPosition(mPreviousCard), model.getCardPosition(mCurrentCard), mScore);
             } else {
-                mBoardView.lostScore(model.getCardPosition(mPreviousCard),model.getCardPosition(mCurrentCard));
-                if (mScore != 0){
+                if (mScore != 0) {
                     mScore--;
                 }
+                mBoardView.lostScore(model.getCardPosition(mPreviousCard), model.getCardPosition(mCurrentCard), mScore);
             }
             mCurrentCard = null;
             mPreviousCard = null;

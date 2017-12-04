@@ -1,6 +1,7 @@
 package com.egoregorov.colourmemory.view;
 
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -9,6 +10,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.GridView;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.egoregorov.colourmemory.R;
 import com.egoregorov.colourmemory.model.Card;
@@ -24,6 +26,7 @@ public class MainActivityFragment extends Fragment implements BoardView {
     private GridView mBoard;
     private BoardPresenter mBoardPresenter = new BoardPresenter(this);
     private boolean mOneSelected = false;
+    private TextView mScore;
 
     public MainActivityFragment() {
     }
@@ -40,7 +43,7 @@ public class MainActivityFragment extends Fragment implements BoardView {
                 if (card != null) {
                     ImageView imageView = (ImageView) view;
                     imageView.setImageResource(card.getImageResourceId());
-                    if (mOneSelected){
+                    if (mOneSelected) {
                         mBoard.setEnabled(false);
                         mOneSelected = false;
                     } else {
@@ -54,12 +57,18 @@ public class MainActivityFragment extends Fragment implements BoardView {
     }
 
     @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        mScore = getActivity().findViewById(R.id.score);
+    }
+
+    @Override
     public void startNewGame() {
         mBoard.setAdapter(new BoardAdapter(getActivity()));
     }
 
     @Override
-    public void lostScore(int position1, int position2) {
+    public void lostScore(int position1, int position2, int currentScore) {
         Log.d(TAG, "lostScore: position1 " + position1);
         Log.d(TAG, "lostScore: position2 " + position2);
         ImageView card;
@@ -68,10 +77,13 @@ public class MainActivityFragment extends Fragment implements BoardView {
         card = (ImageView) mBoard.getItemAtPosition(position2);
         card.setImageResource(R.drawable.card_bg);
         mBoard.setEnabled(true);
+        Log.d(TAG, "lostScore: " + mScore.getText().toString());
+        mScore.setText(String.valueOf(currentScore));
+
     }
 
     @Override
-    public void gotTheScore(int position1, int position2) {
+    public void gotTheScore(int position1, int position2, int currentScore) {
         ImageView card = (ImageView) mBoard.getItemAtPosition(position1);
         card.setVisibility(View.INVISIBLE);
         card.setClickable(false);
@@ -79,6 +91,7 @@ public class MainActivityFragment extends Fragment implements BoardView {
         card.setVisibility(View.INVISIBLE);
         card.setClickable(false);
         mBoard.setEnabled(true);
+        mScore.setText(String.valueOf(currentScore));
 
     }
 }
