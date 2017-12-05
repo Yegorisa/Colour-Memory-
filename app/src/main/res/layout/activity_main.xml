@@ -20,24 +20,25 @@
             android:weightSum="3">
 
             <ImageView
-                android:id="@+id/imageView2"
+                android:id="@+id/activity_main_logo_image"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_marginBottom="4dp"
                 android:layout_marginTop="4dp"
                 android:layout_weight="1"
+                android:contentDescription="@string/logo_description"
                 android:scaleType="fitStart"
                 app:srcCompat="@drawable/logo"/>
 
             <TextView
-                android:id="@+id/score"
+                android:id="@+id/activity_main_score"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:paddingTop="13dp"
-                android:text="0"
                 android:textAlignment="center"
-                android:textSize="24sp"/>
+                android:textSize="24sp"
+                tools:text="0"/>
 
             <android.support.v7.widget.Toolbar
                 android:id="@+id/toolbar"
@@ -51,7 +52,6 @@
     </android.support.design.widget.AppBarLayout>
 
     <include
-        android:id="@+id/activity_main_includeFragment"
         layout="@layout/content_main"/>
 
 </android.support.design.widget.CoordinatorLayout>
