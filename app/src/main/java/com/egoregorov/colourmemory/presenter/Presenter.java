@@ -6,5 +6,4 @@ package com.egoregorov.colourmemory.presenter;
 
 public interface Presenter {
     void onCreate();
-    void onResume();
 }

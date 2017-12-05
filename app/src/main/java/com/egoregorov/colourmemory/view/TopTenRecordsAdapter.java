@@ -88,7 +88,6 @@ public class TopTenRecordsAdapter extends RecyclerView.Adapter<TopTenRecordsAdap
                 holder.rank.setImageResource(R.drawable.rank16);
                 break;
         }
-        //TODO rank image
     }
 
     @Override

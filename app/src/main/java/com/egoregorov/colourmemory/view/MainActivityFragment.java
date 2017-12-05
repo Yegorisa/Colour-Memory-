@@ -8,8 +8,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.GridView;
+import android.widget.GridLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -24,7 +23,7 @@ public class MainActivityFragment extends Fragment implements BoardView{
     private static final String TAG = "MainActivityFragment";
 
     private View mView;
-    private GridView mBoard;
+    private GridLayout mBoardLayout;
     private BoardPresenter mBoardPresenter = new BoardPresenter(this);
     private boolean mOneSelected = false;
     private TextView mScore;
@@ -36,25 +35,27 @@ public class MainActivityFragment extends Fragment implements BoardView{
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         Log.d(TAG, "onCreateView: starts");
-
         mView = inflater.inflate(R.layout.fragment_main, container, false);
-        mBoard = mView.findViewById(R.id.board);
-        mBoard.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
-                Card card = mBoardPresenter.onCardSelected(position);
-                if (card != null) {
-                    ImageView imageView = (ImageView) view;
-                    imageView.setImageResource(card.getImageResourceId());
-                    if (mOneSelected) {
-                        mBoard.setEnabled(false);
-                        mOneSelected = false;
-                    } else {
-                        mOneSelected = true;
+        mBoardLayout = mView.findViewById(R.id.board);
+        for (int i = 0; i < 16; i++) {
+            mBoardLayout.getChildAt(i).setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    int position = mBoardLayout.indexOfChild(view);
+                    Card card = mBoardPresenter.onCardSelected(position);
+                    if (card != null) {
+                        ImageView imageView = (ImageView) view;
+                        imageView.setImageResource(card.getImageResourceId());
+                        if (mOneSelected) {
+                            mBoardLayout.setEnabled(false);
+                            mOneSelected = false;
+                        } else {
+                            mOneSelected = true;
+                        }
                     }
                 }
-            }
-        });
+            });
+        }
         return mView;
     }
 
@@ -62,35 +63,38 @@ public class MainActivityFragment extends Fragment implements BoardView{
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         mScore = getActivity().findViewById(R.id.score);
+
         mBoardPresenter.onCreate();
     }
 
+
     @Override
     public void startNewGame() {
-        mBoard.setAdapter(new BoardAdapter(getActivity()));
+        mBoardLayout = mView.findViewById(R.id.board);
         mScore.setText("0");
+        resetAllCards();
     }
 
     @Override
     public void lostScore(int position1, int position2, int currentScore) {
         ImageView card;
-        card = (ImageView) mBoard.getItemAtPosition(position1);
+        card = (ImageView) mBoardLayout.getChildAt(position1);
         card.setImageResource(R.drawable.card_bg);
-        card = (ImageView) mBoard.getItemAtPosition(position2);
+        card = (ImageView) mBoardLayout.getChildAt(position2);
         card.setImageResource(R.drawable.card_bg);
-        mBoard.setEnabled(true);
+        mBoardLayout.setEnabled(true);
         mScore.setText(String.valueOf(currentScore));
     }
 
     @Override
     public void gotTheScore(int position1, int position2, int currentScore) {
-        ImageView card = (ImageView) mBoard.getItemAtPosition(position1);
+        ImageView card = (ImageView) mBoardLayout.getChildAt(position1);
         card.setVisibility(View.INVISIBLE);
         card.setClickable(false);
-        card = (ImageView) mBoard.getItemAtPosition(position2);
+        card = (ImageView) mBoardLayout.getChildAt(position2);
         card.setVisibility(View.INVISIBLE);
         card.setClickable(false);
-        mBoard.setEnabled(true);
+        mBoardLayout.setEnabled(true);
         mScore.setText(String.valueOf(currentScore));
     }
 
@@ -103,13 +107,14 @@ public class MainActivityFragment extends Fragment implements BoardView{
         dialogFragment.show(getFragmentManager(),"CONGRATULATIONS_DIALOG");
     }
 
-    @Override
-    public void onSaveInstanceState(Bundle outState) {
-        outState.putParcelable("BOARD_PRESENTER",mBoardPresenter);
+    private void resetAllCards(){
+        for (int i = 0; i < 16; i++) {
+            ImageView imageView = (ImageView) mBoardLayout.getChildAt(i);
+            imageView.setImageResource(R.drawable.card_bg);
+            imageView.setVisibility(View.VISIBLE);
+            imageView.setClickable(true);
+        }
     }
 
-    @Override
-    public void onGameResumed() {
 
-    }
 }

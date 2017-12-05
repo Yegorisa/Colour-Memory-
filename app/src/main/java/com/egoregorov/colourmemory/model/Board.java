@@ -41,7 +41,6 @@ public class Board {
         return mCardArrayList.get(position);
     }
 
-
     public int getCardPosition(Card card) {
         return mCardArrayList.indexOf(card);
     }

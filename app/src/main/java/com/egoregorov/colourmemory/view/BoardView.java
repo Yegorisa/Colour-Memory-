@@ -9,5 +9,4 @@ public interface BoardView {
     void lostScore(int position1, int position2, int currentScore);
     void gotTheScore(int position1, int position2, int currentScore);
     void gameCompleted(int finalScore);
-    void onGameResumed();
 }
