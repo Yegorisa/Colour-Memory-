@@ -1,4 +1,5 @@
 <resources>
     <string name="app_name">Colour Memory</string>
     <string name="action_highscores">High Scores</string>
+    <string name="action_settings">Settings</string>
 </resources>

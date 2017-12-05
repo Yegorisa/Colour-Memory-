@@ -1,7 +1,8 @@
 package com.egoregorov.colourmemory.presenter;
 
 import android.os.AsyncTask;
-import android.util.Log;
+import android.os.Parcel;
+import android.os.Parcelable;
 
 import com.egoregorov.colourmemory.model.Board;
 import com.egoregorov.colourmemory.model.Card;
@@ -13,7 +14,7 @@ import java.util.concurrent.TimeUnit;
  * Created by Egor on 04.12.2017.
  */
 
-public class BoardPresenter implements Presenter {
+public class BoardPresenter implements Presenter, Parcelable {
     private static final String TAG = "BoardPresenter";
 
     private Board mModel;
@@ -36,36 +37,21 @@ public class BoardPresenter implements Presenter {
     }
 
     @Override
-    public void onPause() {
-
-    }
-
-    @Override
     public void onResume() {
-
-    }
-
-    @Override
-    public void onDestroy() {
 
     }
 
     public Card onCardSelected(int position) {
         if (mModel.getCard(position).isSelected()) {
-            Log.d(TAG, "onCardSelected: return null");
             return null;
         } else {
-            Log.d(TAG, "onCardSelected: return card");
             Card selectedCard = mModel.getCard(position);
             if (mPreviousCard != null) {
                 mCurrentCard = selectedCard;
 
                 if (selectedCard.getImageResourceId() == mPreviousCard.getImageResourceId()) {
-                    //TODO wait for 1 sec and dismiss cards, and add 2 points to the score
                     new DismissCardsTask().execute(true);
-
                 } else {
-                    //TODO wait for 1 sec and dismiss card, and remove 1 point from score
                     mCurrentCard.setSelected(false);
                     mPreviousCard.setSelected(false);
                     new DismissCardsTask().execute(false);
@@ -79,8 +65,18 @@ public class BoardPresenter implements Presenter {
         }
     }
 
-    public void onHighScoresSelected() {
-
+    private void gotTheScore(){
+        mScore = mScore + 2;
+        mModel.minusTwoCards();
+        mBoardView.gotTheScore(mModel.getCardPosition(mPreviousCard), mModel.getCardPosition(mCurrentCard), mScore);
+    }
+    private void lostScore(){
+        mScore = mScore - 1;
+        mBoardView.lostScore(mModel.getCardPosition(mPreviousCard), mModel.getCardPosition(mCurrentCard), mScore);
+    }
+    private void gameFinished(){
+        mBoardView.gameCompleted(mScore);
+        BoardPresenter.this.onCreate();
     }
 
     class DismissCardsTask extends AsyncTask<Boolean, Void, Void> {
@@ -88,7 +84,6 @@ public class BoardPresenter implements Presenter {
 
         @Override
         protected Void doInBackground(Boolean... booleans) {
-            Log.d(TAG, "doInBackground: starts");
             try {
                 TimeUnit.MILLISECONDS.sleep(750);
             } catch (InterruptedException e) {
@@ -102,22 +97,50 @@ public class BoardPresenter implements Presenter {
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
             if (mWasRight) {
-                mScore = mScore + 2;
-                mBoardView.gotTheScore(mModel.getCardPosition(mPreviousCard), mModel.getCardPosition(mCurrentCard), mScore);
-                mModel.minusTwoCards();
+                gotTheScore();
             } else {
-                if (mScore != 0) {
-                    mScore = mScore - 1;
-                }
-                mBoardView.lostScore(mModel.getCardPosition(mPreviousCard), mModel.getCardPosition(mCurrentCard), mScore);
+                lostScore();
             }
-            Log.d(TAG, "onPostExecute: " + mModel.getCardsLeft());
             if (mModel.getCardsLeft() == 0) {
-                mBoardView.gameCompleted();
+                gameFinished();
             }
             mCurrentCard = null;
             mPreviousCard = null;
-            Log.d(TAG, "onPostExecute: current score is " + mScore);
         }
     }
+
+    protected BoardPresenter(Parcel in) {
+        mModel = (Board) in.readValue(Board.class.getClassLoader());
+        mBoardView = (BoardView) in.readValue(BoardView.class.getClassLoader());
+        mScore = in.readInt();
+        mPreviousCard = (Card) in.readValue(Card.class.getClassLoader());
+        mCurrentCard = (Card) in.readValue(Card.class.getClassLoader());
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeValue(mModel);
+        dest.writeValue(mBoardView);
+        dest.writeInt(mScore);
+        dest.writeValue(mPreviousCard);
+        dest.writeValue(mCurrentCard);
+    }
+
+    @SuppressWarnings("unused")
+    public static final Parcelable.Creator<BoardPresenter> CREATOR = new Parcelable.Creator<BoardPresenter>() {
+        @Override
+        public BoardPresenter createFromParcel(Parcel in) {
+            return new BoardPresenter(in);
+        }
+
+        @Override
+        public BoardPresenter[] newArray(int size) {
+            return new BoardPresenter[size];
+        }
+    };
 }

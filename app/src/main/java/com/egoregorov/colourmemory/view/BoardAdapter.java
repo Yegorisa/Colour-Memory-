@@ -1,7 +1,6 @@
 package com.egoregorov.colourmemory.view;
 
 import android.content.Context;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
@@ -17,7 +16,6 @@ import java.util.List;
  */
 
 public class BoardAdapter extends BaseAdapter {
-    private static final String TAG = "BoardAdapter";
     private Context mContext;
     private List<ImageView> mCardViews;
 
@@ -43,8 +41,6 @@ public class BoardAdapter extends BaseAdapter {
     }
 
     public Object getItem(int position) {
-        Log.d(TAG, "getItem: " + position);
-        Log.d(TAG, "getItem: number of views" + mCardViews.size());
         return mCardViews.get(position);
     }
 
@@ -55,9 +51,6 @@ public class BoardAdapter extends BaseAdapter {
     // create a new ImageView for each item referenced by the Adapter
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        Log.d(TAG, "getView: starts");
         return mCardViews.get(position);
     }
-
-
 }
